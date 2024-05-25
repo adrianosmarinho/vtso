@@ -88,3 +88,20 @@ class Ship(models.Model):
 
     class Meta:
         db_table = "SHIP"
+
+
+class HarbourLog(models.Model):
+    """
+    Each log HabourLog entry contains a record of
+    when a particular Ship arrived and exited a particular Harbour.
+    Assumption: entry_time and exit_time are known when inputting the data.
+    """
+
+    id = models.BigAutoField(primary_key=True)
+    ship = models.ForeignKey(to=Ship, on_delete=models.CASCADE)
+    harbour = models.ForeignKey(to=Harbour, on_delete=models.CASCADE)
+    entry_time = models.DateTimeField(null=True, blank=True)
+    exit_time = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "HABOUR_LOG"
