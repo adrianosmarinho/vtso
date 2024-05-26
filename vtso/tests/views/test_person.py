@@ -38,15 +38,6 @@ class TestPersonList:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 2
 
-        # @pytest.mark.parametrize(
-        # "persons_data, expected_status_code, test_id",
-        # [
-        #     ([{'first_name': 'John', 'email': 'john@example.com', 'phone': '0412345678', 'company': CompanyFactory()}], status.HTTP_200_OK, 'test_001'),
-        #     ([{'first_name': 'Alice', 'email': 'alice@example.com', 'phone': '0398765432', 'company': CompanyFactory()}], status.HTTP_200_OK, 'test_002'),
-        #     ([], status.HTTP_200_OK, 'test_003')
-        # ]
-        # )
-
     @pytest.mark.django_db
     def test_create_person(self):
         """

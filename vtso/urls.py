@@ -6,7 +6,10 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("companies/", views.CompanyList.as_view(), name="companies"),
     path("persons/", views.PersonList.as_view(), name="persons"),
+    # list or create a ship
     path("ships/", views.ShipList.as_view(), name="ships"),
+    # retrieve or update a ship
+    path("ships/<int:pk>/", views.ShipDetail.as_view(), name="ship_detail"),
     path("harbours/", views.HarbourList.as_view(), name="harbours"),
     # TODO: consider renaming HarbourLog to Visit
     path("harbourlogs/", views.HarbourLogList.as_view(), name="harbourlogs"),

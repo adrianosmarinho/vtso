@@ -119,23 +119,79 @@ class TestShipList:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    # @pytest.mark.django_db
-    # def test_create_person_without_company(self):
-    #     """
-    #     POST /persons should return 400 as the View will not
-    #     allow the creation of a Person without a Company
-    #     """
-    #     # Arrange
-    #     client = APIClient()
-    #     person_data = {
-    #         "name": "John",
-    #         "email": "john@example.com",
-    #         "phone": "0412345678",
-    #     }
-    #     url = reverse("persons")
 
-    #     # Act
-    #     response = client.post(url, data=person_data)
+class TestShipDetail:
+    @pytest.mark.django_db
+    def test_ship_detail_view(self):
+        """
+        GET /ships/id should return 200 if the Ship with the
+        given id exists in the database.
+        """
+        # Arrange
+        company = CompanyFactory(name="Roxxon")
+        ship_data = {
+            "company": company,
+            "name": "Sea Master",
+            "tonnage": 4000,
+            "max_load_draft": 9,
+            "dry_draft": 4,
+            "flag": "Germany",
+            "beam": 18,
+            "length": 90,
+            "year_built": "2012",
+            "type": "tanker",
+        }
+        ship = ShipFactory(**ship_data)
+        client = APIClient()
+        url = reverse("ship_detail", kwargs={"pk": ship.id})
 
-    #     # Assert
-    #     assert response.status_code == status.HTTP_400_BAD_REQUEST
+        # Act
+        response = client.get(url)
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["id"] == ship.id
+
+    @pytest.mark.django_db
+    def test_ship_detail_invalid_id(self):
+        """
+        GET /ships/id should return 404 if the Ship with the
+        given id does not exist in the database.
+        """
+        # Arrange
+        client = APIClient()
+        url = reverse("ship_detail", kwargs={"pk": 999})
+
+        # Act
+        response = client.get(url)
+
+        # Assert
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    @pytest.mark.django_db
+    def test_ship_update(self):
+        # Arrange
+        company = CompanyFactory(name="Roxxon")
+        ship_data = {
+            "company": company,
+            "name": "Sea Master",
+            "tonnage": 4000,
+            "max_load_draft": 9,
+            "dry_draft": 4,
+            "flag": "Germany",
+            "beam": 18,
+            "length": 90,
+            "year_built": "2012",
+            "type": "tanker",
+        }
+        ship = ShipFactory(**ship_data)
+        client = APIClient()
+        url = reverse("ship_detail", kwargs={"pk": ship.id})
+        data = {"name": "Titanic"}
+
+        # Act
+        response = client.patch(url, data, format="json")
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["name"] == data["name"]
