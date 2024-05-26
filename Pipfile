@@ -19,6 +19,7 @@ isort = "*"
 mypy = "*"
 pre-commit = "*"
 pytest-django = "*"
+ipython = "*"
 
 [requires]
 python_version = "3.12"
