@@ -77,6 +77,15 @@ class HarbourList(generics.ListCreateAPIView):
     serializer_class = HarbourSerializer
     permission_classes = [AllowAny]
 
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class. Will be used by HarbourSerializer
+        __init__ to filter fields for GET /vtso/harbours.
+        """
+        context = super(HarbourList, self).get_serializer_context()
+        context.update({"request": self.request})
+        return context
+
 
 class HarbourLogList(generics.ListCreateAPIView):
     """

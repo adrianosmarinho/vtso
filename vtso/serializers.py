@@ -45,6 +45,21 @@ class HarbourSerializer(serializers.ModelSerializer):
         model = Harbour
         fields = "__all__"
 
+    def __init__(self, *args, **kwargs):
+        """
+        Filtering the fields here to display in /vtso/harbours was
+        a suggestion of ChatGPT so I could keep both GET and POST methods
+        in one endpoint only and keep the API RESTFul
+        """
+        super(HarbourSerializer, self).__init__(*args, **kwargs)
+        # If the context contains 'request' and the method is 'GET', limit the fields
+        if "request" in self.context and self.context["request"].method == "GET":
+            self.fields = {
+                "id": self.fields["id"],
+                "name": self.fields["name"],
+                "max_berth_depth": self.fields["max_berth_depth"],
+            }
+
 
 class HarbourLogSerializer(serializers.ModelSerializer):
 
