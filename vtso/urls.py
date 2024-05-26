@@ -8,4 +8,6 @@ urlpatterns = [
     path("persons/", views.PersonList.as_view(), name="persons"),
     path("ships/", views.ShipList.as_view(), name="ships"),
     path("harbours/", views.HarbourList.as_view(), name="harbours"),
+    # TODO: consider renaming HarbourLog to Visit
+    path("harbourlogs/", views.HarbourLogList.as_view(), name="harbourlogs"),
 ]

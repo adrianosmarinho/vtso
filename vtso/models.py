@@ -105,3 +105,13 @@ class HarbourLog(models.Model):
 
     class Meta:
         db_table = "HABOUR_LOG"
+
+    def clean(self):
+        """
+        Override of clean() to validate that exit_time happens after entry_time.
+
+        Raises:
+            ValidationError
+        """
+        if self.entry_time and self.exit_time and self.exit_time < self.entry_time:
+            raise ValidationError("Exit time cannot be before entry time.")

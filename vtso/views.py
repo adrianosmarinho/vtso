@@ -3,15 +3,14 @@ from django.http import HttpResponse
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
-from vtso.models import Company, Harbour, Person, Ship
+from vtso.models import Company, Harbour, HarbourLog, Person, Ship
 from vtso.serializers import (
     CompanySerializer,
+    HarbourLogSerializer,
     HarbourSerializer,
     PersonSerializer,
     ShipSerializer,
 )
-
-# from django.shortcuts import render
 
 
 def index(request):
@@ -63,4 +62,15 @@ class HarbourList(generics.ListCreateAPIView):
 
     queryset = Harbour.objects.all()
     serializer_class = HarbourSerializer
+    permission_classes = [AllowAny]
+
+
+class HarbourLogList(generics.ListCreateAPIView):
+    """
+    View for /vtso/harbourlogs endpoint
+    TODO: add authentication
+    """
+
+    queryset = HarbourLog.objects.select_related("harbour", "ship").all()
+    serializer_class = HarbourLogSerializer
     permission_classes = [AllowAny]
