@@ -28,18 +28,14 @@ class ShipSerializer(serializers.ModelSerializer):
 
     def get_age(self, obj):
         """
-        Calculates the current age of a Ship.
+        Gets the current age of a Ship.
 
         Args:
             obj (Ship): a Ship object
 
         Returns:
-            _type_: current age of the Ship
+            current age of the Ship
         """
-        # TODO: write tests
-        # year_built = int(obj.year_built)
-        # current_year = datetime.now().year
-        # return current_year - year_built
         return obj.age
 
 
