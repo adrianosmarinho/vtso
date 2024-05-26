@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from vtso.models import Company, Person, Ship
+from vtso.models import Company, Harbour, Person, Ship
 
 
 class CompanySerializer(serializers.ModelSerializer):
@@ -23,4 +23,11 @@ class ShipSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ship
+        fields = "__all__"
+
+
+class HarbourSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Harbour
         fields = "__all__"

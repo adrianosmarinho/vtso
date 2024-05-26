@@ -1,6 +1,6 @@
 import factory
 
-from vtso.models import Company, Person, Ship
+from vtso.models import Company, Harbour, HarbourLog, Person, Ship
 
 
 class CompanyFactory(factory.django.DjangoModelFactory):
@@ -37,3 +37,24 @@ class ShipFactory(factory.django.DjangoModelFactory):
         "random_element",
         elements=["bulk carrier", "fishing", "submarine", "tanker", "cruise ship"],
     )
+
+
+class HarbourFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Harbour
+
+    name = factory.Faker("city")
+    max_berth_depth = factory.Faker("random_int", min=5, max=20)
+    harbour_master = factory.Faker("name")
+    city = factory.Faker("city")
+    country = factory.Faker("country")
+
+
+class HarbourLogFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = HarbourLog
+
+    ship = factory.SubFactory(ShipFactory)
+    harbour = factory.SubFactory(HarbourFactory)
+    entry_time = factory.Faker("date_time")
+    exit_time = factory.Faker("date_time")

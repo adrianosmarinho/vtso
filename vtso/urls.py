@@ -7,4 +7,5 @@ urlpatterns = [
     path("companies/", views.CompanyList.as_view(), name="companies"),
     path("persons/", views.PersonList.as_view(), name="persons"),
     path("ships/", views.ShipList.as_view(), name="ships"),
+    path("harbours/", views.HarbourList.as_view(), name="harbours"),
 ]
