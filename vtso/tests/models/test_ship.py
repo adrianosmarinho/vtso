@@ -1,7 +1,11 @@
+from datetime import datetime
+from unittest.mock import patch
+
 import pytest
 from django.core.exceptions import ValidationError
 
 from vtso.models import Company, Ship
+from vtso.tests.factories import ShipFactory
 
 
 @pytest.mark.django_db
@@ -188,3 +192,57 @@ class TestShip:
         assert ship.year_built == year_built
         assert ship.type == ship_type
         assert Ship.objects.count() == 1
+
+
+@pytest.mark.django_db
+class TestShipAgeProperty:
+    """
+    Unit tests for the age property of a Ship.
+    """
+
+    @pytest.mark.parametrize(
+        "year_built, expected_age, test_id",
+        [
+            ("2000", 23, "happy_path_2000"),
+            ("1990", 33, "happy_path_1990"),
+            ("1950", 73, "happy_path_1950"),
+            ("2023", 0, "edge_case_current_year"),
+            ("2024", -1, "edge_case_future_year"),
+            ("", None, "edge_case_blank_year"),
+            (None, None, "edge_case_null_year"),
+        ],
+    )
+    def test_ship_age_property(self, year_built, expected_age, test_id):
+        # Arrange
+        ship = ShipFactory(year_built=year_built)
+
+        # Act
+        with patch("vtso.models.datetime") as mock_datetime:
+            mock_datetime.now.return_value = datetime(2023, 1, 1)
+            age = ship.age
+
+        # Assert
+        assert (
+            age == expected_age
+        ), f"Test ID {test_id}: Expected age {expected_age}, got {age}"
+
+    @pytest.mark.parametrize(
+        "year_built, test_id",
+        [
+            ("not_a_year", "error_case_non_integer_year"),
+        ],
+    )
+    def test_ship_age_property_with_invalid_input(self, year_built, test_id):
+        # Arrange
+        ship = ShipFactory.build(year_built=year_built)
+
+        # Act and Assert
+        with pytest.raises(ValidationError), patch(
+            "datetime.datetime"
+        ) as mock_datetime:
+            ship.full_clean()
+            mock_datetime.now.return_value = datetime(2023, 1, 1)
+            _ = ship.age
+            pytest.fail(
+                f"Test ID {test_id}: Expected ValidationError for year_built={year_built}"
+            )

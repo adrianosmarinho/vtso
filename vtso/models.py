@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -88,6 +90,21 @@ class Ship(models.Model):
 
     class Meta:
         db_table = "SHIP"
+
+    @property
+    def age(self) -> int | None:
+        """
+        We use this property to display the age of a Ship
+        on /vtso/ships/ without storing it on the database.
+
+        Returns:
+            int: age of the Ship in years
+        """
+        if not self.year_built:
+            return None
+        year_built = int(self.year_built)
+        current_year = datetime.now().year
+        return current_year - year_built
 
 
 class HarbourLog(models.Model):
