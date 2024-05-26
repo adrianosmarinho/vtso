@@ -9,6 +9,8 @@ django-stubs = "*"
 djangorestframework = "*"
 markdown = "*"
 django-filter = "*"
+djangorestframework-stubs = "*"
+factory-boy = "*"
 
 [dev-packages]
 black = "*"
