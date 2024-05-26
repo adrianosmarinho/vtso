@@ -3,8 +3,8 @@ from django.http import HttpResponse
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
-from vtso.models import Company, Person
-from vtso.serializers import CompanySerializer, PersonSerializer
+from vtso.models import Company, Person, Ship
+from vtso.serializers import CompanySerializer, PersonSerializer, ShipSerializer
 
 # from django.shortcuts import render
 
@@ -36,4 +36,15 @@ class PersonList(generics.ListCreateAPIView):
 
     queryset = Person.objects.select_related("company").all()
     serializer_class = PersonSerializer
+    permission_classes = [AllowAny]
+
+
+class ShipList(generics.ListCreateAPIView):
+    """
+    View for /vtso/ships endpoint
+    TODO: add authentication
+    """
+
+    queryset = Ship.objects.select_related("company").all()
+    serializer_class = ShipSerializer
     permission_classes = [AllowAny]

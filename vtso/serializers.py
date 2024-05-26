@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from vtso.models import Company, Person
+from vtso.models import Company, Person, Ship
 
 
 class CompanySerializer(serializers.ModelSerializer):
@@ -10,9 +10,17 @@ class CompanySerializer(serializers.ModelSerializer):
 
 
 class PersonSerializer(serializers.ModelSerializer):
-    # TODO: check if the queryset can be optimized here
     company = serializers.PrimaryKeyRelatedField(queryset=Company.objects.all())
 
     class Meta:
         model = Person
         fields = ["id", "name", "email", "phone", "company"]
+
+
+class ShipSerializer(serializers.ModelSerializer):
+
+    company = serializers.PrimaryKeyRelatedField(queryset=Company.objects.all())
+
+    class Meta:
+        model = Ship
+        fields = "__all__"
