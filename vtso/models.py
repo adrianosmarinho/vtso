@@ -3,6 +3,7 @@ from datetime import datetime
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.timezone import get_current_timezone
 
 
 class User(AbstractUser):
@@ -103,13 +104,13 @@ class Ship(models.Model):
         if not self.year_built:
             return None
         year_built = int(self.year_built)
-        current_year = datetime.now().year
+        current_year = datetime.now(tz=get_current_timezone()).year
         return current_year - year_built
 
 
-class HarbourLog(models.Model):
+class Visit(models.Model):
     """
-    Each log HabourLog entry contains a record of
+    Each Visit entry contains a record of
     when a particular Ship arrived and exited a particular Harbour.
     Assumption: entry_time and exit_time are known when inputting the data.
     """
@@ -121,7 +122,7 @@ class HarbourLog(models.Model):
     exit_time = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        db_table = "HABOUR_LOG"
+        db_table = "VISIT"
 
     def clean(self):
         """

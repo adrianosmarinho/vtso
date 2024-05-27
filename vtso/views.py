@@ -3,14 +3,14 @@ from django.http import HttpResponse
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
-from vtso.models import Company, Harbour, HarbourLog, Person, Ship
+from vtso.models import Company, Harbour, Person, Ship, Visit
 from vtso.serializers import (
     CompanySerializer,
     HarbourDetailsSerializer,
-    HarbourLogSerializer,
     HarbourSerializer,
     PersonSerializer,
     ShipSerializer,
+    VisitSerializer,
 )
 
 
@@ -92,12 +92,12 @@ class HarbourDetails(generics.RetrieveAPIView):
     permission_classes = [AllowAny]
 
 
-class HarbourLogList(generics.ListCreateAPIView):
+class VisitList(generics.ListCreateAPIView):
     """
-    View for /vtso/harbourlogs endpoint
+    View for /vtso/visits endpoint
     TODO: add authentication
     """
 
-    queryset = HarbourLog.objects.select_related("harbour", "ship").all()
-    serializer_class = HarbourLogSerializer
+    queryset = Visit.objects.select_related("harbour", "ship").all()
+    serializer_class = VisitSerializer
     permission_classes = [AllowAny]

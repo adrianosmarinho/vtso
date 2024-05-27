@@ -1,8 +1,9 @@
 from datetime import datetime
 
+from django.utils.timezone import get_current_timezone
 from rest_framework import serializers
 
-from vtso.models import Company, Harbour, HarbourLog, Person, Ship
+from vtso.models import Company, Harbour, Person, Ship, Visit
 
 
 class CompanySerializer(serializers.ModelSerializer):
@@ -88,21 +89,21 @@ class HarbourDetailsSerializer(serializers.ModelSerializer):
         Returns:
             list[dict]: list of serialized Ship objects
         """
-        current_time = datetime.now()
-        logs = HarbourLog.objects.filter(
+        current_time = datetime.now(tz=get_current_timezone())
+        logs = Visit.objects.filter(
             harbour=obj, entry_time__lte=current_time, exit_time__gte=current_time
         ).select_related("ship")
         ships = [log.ship for log in logs]
         return ShipSerializer(ships, many=True).data
 
 
-class HarbourLogSerializer(serializers.ModelSerializer):
+class VisitSerializer(serializers.ModelSerializer):
 
     harbour = serializers.PrimaryKeyRelatedField(queryset=Harbour.objects.all())
     ship = serializers.PrimaryKeyRelatedField(queryset=Ship.objects.all())
 
     class Meta:
-        model = HarbourLog
+        model = Visit
         fields = "__all__"
 
     def validate(self, data):
@@ -111,11 +112,11 @@ class HarbourLogSerializer(serializers.ModelSerializer):
         and prevents entry_times of happening after exit_times
 
         Args:
-            data(Any): new HarbourLog data.
+            data(Any): new Visit data.
 
         Returns:
             (Any): cleaned data
         """
-        instance = HarbourLog(**data)
+        instance = Visit(**data)
         instance.clean()
         return data

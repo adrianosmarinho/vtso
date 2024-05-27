@@ -17,6 +17,5 @@ urlpatterns = [
         views.HarbourDetails.as_view(),
         name="harbour_details",
     ),
-    # TODO: consider renaming HarbourLog to Visit
-    path("harbourlogs/", views.HarbourLogList.as_view(), name="harbourlogs"),
+    path("visits/", views.VisitList.as_view(), name="visits"),
 ]

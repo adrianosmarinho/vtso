@@ -1,6 +1,6 @@
 import factory
 
-from vtso.models import Company, Harbour, HarbourLog, Person, Ship
+from vtso.models import Company, Harbour, Person, Ship, Visit
 
 
 class CompanyFactory(factory.django.DjangoModelFactory):
@@ -50,9 +50,9 @@ class HarbourFactory(factory.django.DjangoModelFactory):
     country = factory.Faker("country")
 
 
-class HarbourLogFactory(factory.django.DjangoModelFactory):
+class VisitFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = HarbourLog
+        model = Visit
 
     ship = factory.SubFactory(ShipFactory)
     harbour = factory.SubFactory(HarbourFactory)

@@ -3,11 +3,10 @@ from datetime import timedelta
 import pytest
 from django.utils import timezone
 
-from vtso.models import Company, Harbour, HarbourLog, Ship
+from vtso.models import Company, Harbour, Ship, Visit
 
 
-class TestHarbourLog:
-    # TODO: review this test to check if we should use datetime.now()
+class TestVisit:
     @pytest.mark.django_db
     @pytest.mark.parametrize(
         "ship_name, harbour_name, entry_time, exit_time, test_id",
@@ -46,13 +45,13 @@ class TestHarbourLog:
         ship = Ship.objects.create(name=ship_name, company=company)
 
         # Act
-        harbour_log = HarbourLog.objects.create(
+        visit = Visit.objects.create(
             ship=ship, harbour=harbour, entry_time=entry_time, exit_time=exit_time
         )
 
         # Assert
-        assert harbour_log.ship == ship
-        assert harbour_log.harbour == harbour
-        assert harbour_log.entry_time == entry_time
-        assert harbour_log.exit_time == exit_time
-        assert HarbourLog.objects.count() == 1
+        assert visit.ship == ship
+        assert visit.harbour == harbour
+        assert visit.entry_time == entry_time
+        assert visit.exit_time == exit_time
+        assert Visit.objects.count() == 1

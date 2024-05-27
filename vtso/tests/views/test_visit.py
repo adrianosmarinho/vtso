@@ -6,16 +6,16 @@ from rest_framework.test import APIClient
 from vtso.tests.factories import (
     CompanyFactory,
     HarbourFactory,
-    HarbourLogFactory,
     ShipFactory,
+    VisitFactory,
 )
 
 
 @pytest.mark.django_db
-class TestHarbourLogList:
+class TestVisitList:
 
     @pytest.mark.django_db
-    def test_harbourlog_list(self):
+    def test_visit_list(self):
         # Arrange
 
         company = CompanyFactory(name="Stark Industries")
@@ -23,7 +23,7 @@ class TestHarbourLogList:
         harbour = HarbourFactory(
             name="Sydney Harbour", city="Sydney", country="Australia"
         )
-        _ = HarbourLogFactory(
+        _ = VisitFactory(
             **{
                 "ship": ship,
                 "harbour": harbour,
@@ -31,7 +31,7 @@ class TestHarbourLogList:
                 "exit_time": "2023-05-26T14:30:00Z",
             }
         )
-        _ = HarbourLogFactory(
+        _ = VisitFactory(
             **{
                 "ship": ship,
                 "harbour": harbour,
@@ -40,7 +40,7 @@ class TestHarbourLogList:
             }
         )
         client = APIClient()
-        url = reverse("harbourlogs")
+        url = reverse("visits")
 
         # Act
         response = client.get(url)
@@ -50,9 +50,9 @@ class TestHarbourLogList:
         assert len(response.data) == 2
 
     @pytest.mark.django_db
-    def test_create_harbourlog(self):
+    def test_create_visit(self):
         """
-        POST /harbourlog should return 201
+        POST /visit should return 201
         """
         # Arrange
         client = APIClient()
@@ -61,16 +61,16 @@ class TestHarbourLogList:
         harbour = HarbourFactory(
             name="Sydney Harbour", city="Sydney", country="Australia"
         )
-        harbourlog_data = {
+        visit_data = {
             "ship": ship.id,
             "harbour": harbour.id,
             "entry_time": "2023-05-26T10:15:30Z",
             "exit_time": "2023-05-26T14:30:00Z",
         }
-        url = reverse("harbourlogs")
+        url = reverse("visits")
 
         # Act
-        response = client.post(url, data=harbourlog_data)
+        response = client.post(url, data=visit_data)
 
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
@@ -79,20 +79,20 @@ class TestHarbourLogList:
     @pytest.mark.django_db
     def test_create_habourlog_without_ship(self):
         """
-        POST /harbourlogs should return 400 as the View will not
-        allow the creation of a HarbourLog without a Ship
+        POST /visits should return 400 as the View will not
+        allow the creation of a Visit without a Ship
         """
         # Arrange
         client = APIClient()
-        harbourlog_data = {
+        visit_data = {
             "harbour": 201,
             "entry_time": "2023-05-26T10:15:30Z",
             "exit_time": "2023-05-26T14:30:00Z",
         }
-        url = reverse("harbourlogs")
+        url = reverse("visits")
 
         # Act
-        response = client.post(url, data=harbourlog_data)
+        response = client.post(url, data=visit_data)
 
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -100,20 +100,20 @@ class TestHarbourLogList:
     @pytest.mark.django_db
     def test_create_habourlog_without_harbour(self):
         """
-        POST /harbourlogs should return 400 as the View will not
-        allow the creation of a HarbourLog without a Harbour
+        POST /visits should return 400 as the View will not
+        allow the creation of a Visit without a Harbour
         """
         # Arrange
         client = APIClient()
-        harbourlog_data = {
+        visit_data = {
             "ship": 101,
             "entry_time": "2023-05-26T10:15:30Z",
             "exit_time": "2023-05-26T14:30:00Z",
         }
-        url = reverse("harbourlogs")
+        url = reverse("visits")
 
         # Act
-        response = client.post(url, data=harbourlog_data)
+        response = client.post(url, data=visit_data)
 
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST

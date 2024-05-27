@@ -2,10 +2,11 @@ from datetime import datetime, timedelta
 
 import pytest
 from django.urls import reverse
+from django.utils.timezone import get_current_timezone
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from vtso.tests.factories import HarbourFactory, HarbourLogFactory, ShipFactory
+from vtso.tests.factories import HarbourFactory, ShipFactory, VisitFactory
 
 
 @pytest.mark.django_db
@@ -112,14 +113,14 @@ class TestHarbourDetails:
         # Arrange
         harbour = HarbourFactory()
         ships = ShipFactory.create_batch(2)
-        current_time = datetime.now()
-        _ = HarbourLogFactory(
+        current_time = datetime.now(tz=get_current_timezone())
+        _ = VisitFactory(
             ship=ships[0],
             harbour=harbour,
             entry_time=current_time - timedelta(days=5),
             exit_time=current_time - timedelta(days=2),
         )
-        _ = HarbourLogFactory(
+        _ = VisitFactory(
             ship=ships[1],
             harbour=harbour,
             entry_time=current_time - timedelta(days=4),
