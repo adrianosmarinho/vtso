@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import serializers
 
 from vtso.models import Company, Harbour, HarbourLog, Person, Ship
@@ -59,6 +61,39 @@ class HarbourSerializer(serializers.ModelSerializer):
                 "name": self.fields["name"],
                 "max_berth_depth": self.fields["max_berth_depth"],
             }
+
+
+class HarbourDetailsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Harbour
+        fields = [
+            "id",
+            "name",
+            "max_berth_depth",
+            "harbour_master",
+            "city",
+            "country",
+            "current_ships",
+        ]
+
+    current_ships = serializers.SerializerMethodField()
+
+    def get_current_ships(self, obj):
+        """
+        Computes the Ships currently docked at the harbour.
+        Args:
+            obj (Harbour): Harbour being processed by HarbourDetailView
+
+        Returns:
+            list[dict]: list of serialized Ship objects
+        """
+        current_time = datetime.now()
+        logs = HarbourLog.objects.filter(
+            harbour=obj, entry_time__lte=current_time, exit_time__gte=current_time
+        ).select_related("ship")
+        ships = [log.ship for log in logs]
+        return ShipSerializer(ships, many=True).data
 
 
 class HarbourLogSerializer(serializers.ModelSerializer):

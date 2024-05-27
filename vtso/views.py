@@ -6,6 +6,7 @@ from rest_framework.permissions import AllowAny
 from vtso.models import Company, Harbour, HarbourLog, Person, Ship
 from vtso.serializers import (
     CompanySerializer,
+    HarbourDetailsSerializer,
     HarbourLogSerializer,
     HarbourSerializer,
     PersonSerializer,
@@ -77,14 +78,18 @@ class HarbourList(generics.ListCreateAPIView):
     serializer_class = HarbourSerializer
     permission_classes = [AllowAny]
 
-    def get_serializer_context(self):
-        """
-        Extra context provided to the serializer class. Will be used by HarbourSerializer
-        __init__ to filter fields for GET /vtso/harbours.
-        """
-        context = super(HarbourList, self).get_serializer_context()
-        context.update({"request": self.request})
-        return context
+
+class HarbourDetails(generics.RetrieveAPIView):
+    """
+    View for /vtso/harbours/id/details/ endpoint
+    A GET request will retrieve de details of a given Harbour, including
+    a list of Ships currently docked at it.
+    TODO: add authentication
+    """
+
+    queryset = Harbour.objects.all()
+    serializer_class = HarbourDetailsSerializer
+    permission_classes = [AllowAny]
 
 
 class HarbourLogList(generics.ListCreateAPIView):

@@ -1,13 +1,19 @@
+from datetime import datetime, timedelta
+
 import pytest
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from vtso.tests.factories import HarbourFactory
+from vtso.tests.factories import HarbourFactory, HarbourLogFactory, ShipFactory
 
 
 @pytest.mark.django_db
 class TestHarbourList:
+    """
+    Unit tests for /harbours/
+    """
+
     @pytest.mark.parametrize(
         "harbours_count, expected_status_code, test_id",
         [
@@ -88,3 +94,58 @@ class TestHarbourList:
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["name"] == harbour_data["name"]
+
+
+class TestHarbourDetails:
+    """
+    Unit tests for /harbours/<int:pk>/details/
+    """
+
+    @pytest.mark.django_db
+    def test_harbour_details_view(self):
+        """
+        GET /harbours/id/details should return 200
+        and contain one ship docked.
+        """
+        client = APIClient()
+
+        # Arrange
+        harbour = HarbourFactory()
+        ships = ShipFactory.create_batch(2)
+        current_time = datetime.now()
+        _ = HarbourLogFactory(
+            ship=ships[0],
+            harbour=harbour,
+            entry_time=current_time - timedelta(days=5),
+            exit_time=current_time - timedelta(days=2),
+        )
+        _ = HarbourLogFactory(
+            ship=ships[1],
+            harbour=harbour,
+            entry_time=current_time - timedelta(days=4),
+            exit_time=current_time + timedelta(days=2),
+        )
+        url = reverse("harbour_details", kwargs={"pk": harbour.id})
+
+        # Act
+        response = client.get(url)
+
+        # # Assert
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data["current_ships"]) == 1
+
+    @pytest.mark.django_db
+    def test_harbour_details_view_non_existent_harbour(self):
+        """
+        GET /harbours/id/details should return 404.
+        """
+        client = APIClient()
+
+        # Arrange
+        url = reverse("harbour_details", kwargs={"pk": 999})
+
+        # Act
+        response = client.get(url)
+
+        # # Assert
+        assert response.status_code == status.HTTP_404_NOT_FOUND
