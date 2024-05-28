@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.contrib import admin
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -17,8 +18,20 @@ class Company(models.Model):
 
     class Meta:
         db_table = "COMPANY"
+        verbose_name_plural = "Companies"
+
+    def __str__(self):
+        return f"Company: {self.name}"
 
 
+class CompanyAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+
+    # enables seach on the Admin portal
+    search_fields = ["name"]
+
+
+# Person
 class Person(models.Model):
     id = models.BigAutoField(primary_key=True)
     # a Company may employ many Persons
@@ -31,6 +44,14 @@ class Person(models.Model):
         db_table = "PERSON"
 
 
+class PersonAdmin(admin.ModelAdmin):
+    list_display = ("name", "email", "phone", "company")
+
+    # enables seach on the Admin portal
+    search_fields = ["name", "email", "company__name"]
+
+
+# Harbour
 class Harbour(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=256, null=True, blank=True)
@@ -43,7 +64,18 @@ class Harbour(models.Model):
     class Meta:
         db_table = "HARBOUR"
 
+    def __str__(self):
+        return f"Harbour: {self.name}"
 
+
+class HarbourAdmin(admin.ModelAdmin):
+    list_display = ("name", "max_berth_depth", "city", "country")
+
+    # enables seach on the Admin portal
+    search_fields = ["name", "max_berth_depth", "city", "country"]
+
+
+# Ship
 def validate_year_in_range(value):
     if value is None or value == "":
         # If the value is None or an empty string, it's valid because null=True and blank=True in the model field
@@ -107,7 +139,27 @@ class Ship(models.Model):
         current_year = datetime.now(tz=get_current_timezone()).year
         return current_year - year_built
 
+    def __str__(self):
+        return f"Ship: {self.name}"
 
+
+class ShipAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "tonnage",
+        "max_load_draft",
+        "dry_draft",
+        "flag",
+        "beam",
+        "length",
+        "company",
+    )
+
+    # enables seach on the Admin portal
+    search_fields = ["name", "tonnage", "flag", "company__name"]
+
+
+# Visit
 class Visit(models.Model):
     """
     Each Visit entry contains a record of
@@ -133,3 +185,15 @@ class Visit(models.Model):
         """
         if self.entry_time and self.exit_time and self.exit_time < self.entry_time:
             raise ValidationError("Exit time cannot be before entry time.")
+
+
+class VisitAdmin(admin.ModelAdmin):
+    list_display = (
+        "ship",
+        "harbour",
+        "entry_time",
+        "exit_time",
+    )
+
+    # enables seach on the Admin portal
+    search_fields = ["ship__name", "harbour__name", "entry_time", "exit_time"]
