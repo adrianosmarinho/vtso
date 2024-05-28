@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.contrib import admin
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -17,6 +18,14 @@ class Company(models.Model):
 
     class Meta:
         db_table = "COMPANY"
+        verbose_name_plural = "Companies"
+
+
+class CompanyAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+
+    # enables seach on the Admin portal
+    search_fields = ["name"]
 
 
 class Person(models.Model):
