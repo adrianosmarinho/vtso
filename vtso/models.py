@@ -51,6 +51,7 @@ class PersonAdmin(admin.ModelAdmin):
     search_fields = ["name", "email"]
 
 
+# Harbour
 class Harbour(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=256, null=True, blank=True)
@@ -62,6 +63,13 @@ class Harbour(models.Model):
 
     class Meta:
         db_table = "HARBOUR"
+
+
+class HarbourAdmin(admin.ModelAdmin):
+    list_display = ("name", "max_berth_depth", "city", "country")
+
+    # enables seach on the Admin portal
+    search_fields = ["name", "max_berth_depth", "city", "country"]
 
 
 def validate_year_in_range(value):
