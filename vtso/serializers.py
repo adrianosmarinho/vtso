@@ -42,6 +42,15 @@ class ShipSerializer(serializers.ModelSerializer):
         return obj.age
 
 
+class ShipVisitSerializer(serializers.ModelSerializer):
+
+    harbour_name = serializers.CharField(source="harbour.name", read_only=True)
+
+    class Meta:
+        model = Visit
+        fields = ["harbour_name", "entry_time", "exit_time"]
+
+
 class HarbourSerializer(serializers.ModelSerializer):
 
     class Meta:

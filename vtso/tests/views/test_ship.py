@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from vtso.tests.factories import CompanyFactory, ShipFactory
+from vtso.tests.factories import CompanyFactory, ShipFactory, VisitFactory
 
 
 class TestShipList:
@@ -195,3 +195,56 @@ class TestShipDetail:
         # Assert
         assert response.status_code == status.HTTP_200_OK
         assert response.data["name"] == data["name"]
+
+
+class TestShipVisits:
+
+    @pytest.mark.django_db
+    def test_ship_visits_multiple_visits(self):
+        """
+        GET /ships/<int:pk>/visits should return 200 with
+        2 Harbours listed.
+        """
+
+        client = APIClient()
+
+        ship = ShipFactory()
+        _ = VisitFactory.create_batch(2, ship=ship)
+        url = reverse("ship_visits", kwargs={"pk": ship.pk})
+
+        response = client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) == 2
+
+    @pytest.mark.django_db
+    def test_ship_visits_no_visits(self):
+        """
+        GET /ships/<int:pk>/visits should return 200 with
+        no data if the Ship did not visit any Harbous.
+        """
+        client = APIClient()
+
+        ship_no_visits = ShipFactory()
+        url_no_visits = reverse("ship_visits", kwargs={"pk": ship_no_visits.pk})
+
+        response_no_visits = client.get(url_no_visits)
+
+        assert response_no_visits.status_code == status.HTTP_200_OK
+        assert len(response_no_visits.data) == 0
+
+    @pytest.mark.django_db
+    def test_ship_visits_error_cases(self):
+        """
+        GET /ships/<int:pk>/visits should return 200 with
+        no data if the Ship did not visit any Harbous.
+        """
+        client = APIClient()
+
+        # Error case: Ship does not exist
+        url_ship_not_found = reverse("ship_visits", kwargs={"pk": 999})
+
+        response = client.get(url_ship_not_found)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert "Ship not found" in response.data["detail"]

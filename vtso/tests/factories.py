@@ -1,4 +1,5 @@
 import factory
+from django.utils.timezone import get_current_timezone
 
 from vtso.models import Company, Harbour, Person, Ship, Visit
 
@@ -56,5 +57,5 @@ class VisitFactory(factory.django.DjangoModelFactory):
 
     ship = factory.SubFactory(ShipFactory)
     harbour = factory.SubFactory(HarbourFactory)
-    entry_time = factory.Faker("date_time")
-    exit_time = factory.Faker("date_time")
+    entry_time = factory.Faker("date_time", tzinfo=get_current_timezone())
+    exit_time = factory.Faker("date_time", tzinfo=get_current_timezone())

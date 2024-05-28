@@ -1,6 +1,7 @@
 # Create your views here.
 from django.http import HttpResponse
 from rest_framework import generics
+from rest_framework.exceptions import NotFound
 from rest_framework.permissions import AllowAny
 
 from vtso.models import Company, Harbour, Person, Ship, Visit
@@ -10,6 +11,7 @@ from vtso.serializers import (
     HarbourSerializer,
     PersonSerializer,
     ShipSerializer,
+    ShipVisitSerializer,
     VisitSerializer,
 )
 
@@ -57,7 +59,7 @@ class ShipList(generics.ListCreateAPIView):
 
 class ShipDetail(generics.RetrieveUpdateAPIView):
     """
-    View for /vtso/ships/id/ endpoint
+    View for /vtso/ships/<int:pk>/ endpoint
     A GET request will retrieve de details of a given Ship, while
     a PUT or PATCH request will update a given Ship.
     TODO: add authentication
@@ -66,6 +68,23 @@ class ShipDetail(generics.RetrieveUpdateAPIView):
     queryset = Ship.objects.select_related("company").all()
     serializer_class = ShipSerializer
     permission_classes = [AllowAny]
+
+
+class ShipVisits(generics.ListAPIView):
+    """
+    View for /vtso/ships/<int:pk>/visits/ endpoint.
+    """
+
+    serializer_class = ShipVisitSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        ship_id = self.kwargs["pk"]
+        try:
+            ship = Ship.objects.get(pk=ship_id)
+            return Visit.objects.filter(ship=ship)
+        except Ship.DoesNotExist as e:
+            raise NotFound("Ship not found") from e
 
 
 class HarbourList(generics.ListCreateAPIView):
