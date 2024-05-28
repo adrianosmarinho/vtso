@@ -20,6 +20,9 @@ class Company(models.Model):
         db_table = "COMPANY"
         verbose_name_plural = "Companies"
 
+    def __str__(self):
+        return f"Company: {self.name}"
+
 
 class CompanyAdmin(admin.ModelAdmin):
     list_display = ("name",)
@@ -28,6 +31,7 @@ class CompanyAdmin(admin.ModelAdmin):
     search_fields = ["name"]
 
 
+# Person
 class Person(models.Model):
     id = models.BigAutoField(primary_key=True)
     # a Company may employ many Persons
@@ -38,6 +42,13 @@ class Person(models.Model):
 
     class Meta:
         db_table = "PERSON"
+
+
+class PersonAdmin(admin.ModelAdmin):
+    list_display = ("name", "email", "phone", "company")
+
+    # enables seach on the Admin portal
+    search_fields = ["name", "email"]
 
 
 class Harbour(models.Model):
