@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.utils.timezone import get_current_timezone
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from vtso.models import Company, Harbour, Person, Ship, Visit
@@ -29,7 +30,7 @@ class ShipSerializer(serializers.ModelSerializer):
         model = Ship
         fields = "__all__"
 
-    def get_age(self, obj):
+    def get_age(self, obj: Ship) -> int | None:
         """
         Gets the current age of a Ship.
 
@@ -51,29 +52,26 @@ class ShipVisitSerializer(serializers.ModelSerializer):
         fields = ["harbour_name", "entry_time", "exit_time"]
 
 
-class HarbourSerializer(serializers.ModelSerializer):
+class HarbourListSerializer(serializers.ModelSerializer):
+    """
+    Used on GET /harbours/
+    """
 
     class Meta:
         model = Harbour
-        fields = "__all__"
+        fields = ["id", "name", "max_berth_depth"]
 
-    def __init__(self, *args, **kwargs):
-        """
-        Filtering the fields here to display in /vtso/harbours was
-        a suggestion of ChatGPT so I could keep both GET and POST methods
-        in one endpoint only and keep the API RESTFul
-        """
-        super(HarbourSerializer, self).__init__(*args, **kwargs)
-        # If the context contains 'request' and the method is 'GET', limit the fields
-        if "request" in self.context and self.context["request"].method == "GET":
-            self.fields = {
-                "id": self.fields["id"],
-                "name": self.fields["name"],
-                "max_berth_depth": self.fields["max_berth_depth"],
-            }
+
+class HarbourCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Harbour
+        fields = ["name", "max_berth_depth", "harbour_master", "city", "country"]
 
 
 class HarbourDetailsSerializer(serializers.ModelSerializer):
+    """
+    Used on /POST /harbours
+    """
 
     class Meta:
         model = Harbour
@@ -89,6 +87,7 @@ class HarbourDetailsSerializer(serializers.ModelSerializer):
 
     current_ships = serializers.SerializerMethodField()
 
+    @extend_schema_field(serializers.ListSerializer(child=ShipSerializer()))
     def get_current_ships(self, obj):
         """
         Computes the Ships currently docked at the harbour.

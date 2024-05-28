@@ -1,4 +1,5 @@
 from django.urls import path
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from . import views
 
@@ -20,4 +21,12 @@ urlpatterns = [
         name="harbour_details",
     ),
     path("visits/", views.VisitList.as_view(), name="visits"),
+    # generates and downloads an OpenAPI yaml schema
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    # OpenAPI Swagger UI
+    path(
+        "api/schema/swagger-ui/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
 ]

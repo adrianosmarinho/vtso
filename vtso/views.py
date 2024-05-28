@@ -1,6 +1,7 @@
 # Create your views here.
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import OpenApiResponse, extend_schema, extend_schema_view
 from rest_framework import generics
 from rest_framework.exceptions import NotFound
 from rest_framework.filters import SearchFilter
@@ -9,8 +10,9 @@ from rest_framework.permissions import AllowAny
 from vtso.models import Company, Harbour, Person, Ship, Visit
 from vtso.serializers import (
     CompanySerializer,
+    HarbourCreateSerializer,
     HarbourDetailsSerializer,
-    HarbourSerializer,
+    HarbourListSerializer,
     PersonSerializer,
     ShipSerializer,
     ShipVisitSerializer,
@@ -25,11 +27,10 @@ def index(request):
 class CompanyList(generics.ListCreateAPIView):
     """
     View for /vtso/companies endpoint
-    TODO: add authentication
-    TODO: (bonus) change the view to disallow blank Company names
 
-    Args:
-        generics (_type_): _description_
+    TODO: add authentication
+
+    TODO: (bonus) change the view to disallow blank Company names
     """
 
     queryset = Company.objects.all()
@@ -94,15 +95,44 @@ class ShipVisits(generics.ListAPIView):
             raise NotFound("Ship not found") from e
 
 
+@extend_schema_view(
+    get=extend_schema(
+        description="Retrieve a list of harbours",
+        responses={200: HarbourListSerializer(many=True)},
+    ),
+    post=extend_schema(
+        description="Create a new harbour",
+        request=HarbourCreateSerializer,
+        responses={
+            201: OpenApiResponse(
+                response=HarbourCreateSerializer, description="Created harbour"
+            ),
+            400: OpenApiResponse(description="Validation error"),
+        },
+    ),
+)
 class HarbourList(generics.ListCreateAPIView):
     """
     View for /vtso/harbours endpoint
+
     TODO: add authentication
     """
 
     queryset = Harbour.objects.all()
-    serializer_class = HarbourSerializer
     permission_classes = [AllowAny]
+
+    def get_serializer_class(self):
+        """
+        Override of get_serializer_class so we can return the appropriate
+        serializer according to the request method.
+        This also allows us to simplify customization of the OpenApi schema.
+
+        Returns:
+            HarbourCreateSerializer if POST request, HarbourListSerializer if GET.
+        """
+        if self.request.method == "POST":
+            return HarbourCreateSerializer
+        return HarbourListSerializer
 
 
 class HarbourDetails(generics.RetrieveAPIView):
