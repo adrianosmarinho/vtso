@@ -6,6 +6,11 @@ name = "pypi"
 [packages]
 django = "*"
 django-stubs = "*"
+djangorestframework = "*"
+markdown = "*"
+django-filter = "*"
+djangorestframework-stubs = "*"
+factory-boy = "*"
 
 [dev-packages]
 black = "*"
@@ -14,6 +19,7 @@ isort = "*"
 mypy = "*"
 pre-commit = "*"
 pytest-django = "*"
+ipython = "*"
 
 [requires]
 python_version = "3.12"

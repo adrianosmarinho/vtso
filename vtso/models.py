@@ -1,6 +1,9 @@
+from datetime import datetime
+
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.timezone import get_current_timezone
 
 
 class User(AbstractUser):
@@ -89,10 +92,25 @@ class Ship(models.Model):
     class Meta:
         db_table = "SHIP"
 
+    @property
+    def age(self) -> int | None:
+        """
+        We use this property to display the age of a Ship
+        on /vtso/ships/ without storing it on the database.
 
-class HarbourLog(models.Model):
+        Returns:
+            int: age of the Ship in years
+        """
+        if not self.year_built:
+            return None
+        year_built = int(self.year_built)
+        current_year = datetime.now(tz=get_current_timezone()).year
+        return current_year - year_built
+
+
+class Visit(models.Model):
     """
-    Each log HabourLog entry contains a record of
+    Each Visit entry contains a record of
     when a particular Ship arrived and exited a particular Harbour.
     Assumption: entry_time and exit_time are known when inputting the data.
     """
@@ -104,4 +122,14 @@ class HarbourLog(models.Model):
     exit_time = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        db_table = "HABOUR_LOG"
+        db_table = "VISIT"
+
+    def clean(self):
+        """
+        Override of clean() to validate that exit_time happens after entry_time.
+
+        Raises:
+            ValidationError
+        """
+        if self.entry_time and self.exit_time and self.exit_time < self.entry_time:
+            raise ValidationError("Exit time cannot be before entry time.")
