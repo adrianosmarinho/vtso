@@ -48,7 +48,7 @@ class PersonAdmin(admin.ModelAdmin):
     list_display = ("name", "email", "phone", "company")
 
     # enables seach on the Admin portal
-    search_fields = ["name", "email"]
+    search_fields = ["name", "email", "company__name"]
 
 
 # Harbour
@@ -72,6 +72,7 @@ class HarbourAdmin(admin.ModelAdmin):
     search_fields = ["name", "max_berth_depth", "city", "country"]
 
 
+# Ship
 def validate_year_in_range(value):
     if value is None or value == "":
         # If the value is None or an empty string, it's valid because null=True and blank=True in the model field
@@ -134,6 +135,22 @@ class Ship(models.Model):
         year_built = int(self.year_built)
         current_year = datetime.now(tz=get_current_timezone()).year
         return current_year - year_built
+
+
+class ShipAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "tonnage",
+        "max_load_draft",
+        "dry_draft",
+        "flag",
+        "beam",
+        "length",
+        "company",
+    )
+
+    # enables seach on the Admin portal
+    search_fields = ["name", "tonnage", "flag", "company__name"]
 
 
 class Visit(models.Model):
