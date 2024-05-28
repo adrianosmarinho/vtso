@@ -64,6 +64,9 @@ class Harbour(models.Model):
     class Meta:
         db_table = "HARBOUR"
 
+    def __str__(self):
+        return f"Harbour: {self.name}"
+
 
 class HarbourAdmin(admin.ModelAdmin):
     list_display = ("name", "max_berth_depth", "city", "country")
@@ -136,6 +139,9 @@ class Ship(models.Model):
         current_year = datetime.now(tz=get_current_timezone()).year
         return current_year - year_built
 
+    def __str__(self):
+        return f"Ship: {self.name}"
+
 
 class ShipAdmin(admin.ModelAdmin):
     list_display = (
@@ -153,6 +159,7 @@ class ShipAdmin(admin.ModelAdmin):
     search_fields = ["name", "tonnage", "flag", "company__name"]
 
 
+# Visit
 class Visit(models.Model):
     """
     Each Visit entry contains a record of
@@ -178,3 +185,15 @@ class Visit(models.Model):
         """
         if self.entry_time and self.exit_time and self.exit_time < self.entry_time:
             raise ValidationError("Exit time cannot be before entry time.")
+
+
+class VisitAdmin(admin.ModelAdmin):
+    list_display = (
+        "ship",
+        "harbour",
+        "entry_time",
+        "exit_time",
+    )
+
+    # enables seach on the Admin portal
+    search_fields = ["ship__name", "harbour__name", "entry_time", "exit_time"]
