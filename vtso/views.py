@@ -1,7 +1,9 @@
 # Create your views here.
 from django.http import HttpResponse
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
 from rest_framework.exceptions import NotFound
+from rest_framework.filters import SearchFilter
 from rest_framework.permissions import AllowAny
 
 from vtso.models import Company, Harbour, Person, Ship, Visit
@@ -48,13 +50,18 @@ class PersonList(generics.ListCreateAPIView):
 
 class ShipList(generics.ListCreateAPIView):
     """
-    View for /vtso/ships endpoint
+    View for /vtso/ships endpoint.
+    Here we leverage DRF filtering and search to implement
+    the bonus requirement.
     TODO: add authentication
     """
 
     queryset = Ship.objects.select_related("company").all()
     serializer_class = ShipSerializer
     permission_classes = [AllowAny]
+    filter_backends = [SearchFilter, DjangoFilterBackend]
+    filterset_fields = ["type"]
+    search_fields = ["name", "type", "year_built"]
 
 
 class ShipDetail(generics.RetrieveUpdateAPIView):
