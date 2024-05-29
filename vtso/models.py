@@ -152,11 +152,13 @@ class ShipAdmin(admin.ModelAdmin):
         "flag",
         "beam",
         "length",
+        "year_built",
+        "type",
         "company",
     )
 
     # enables seach on the Admin portal
-    search_fields = ["name", "tonnage", "flag", "company__name"]
+    search_fields = ["name", "tonnage", "flag", "type", "company__name"]
 
 
 # Visit

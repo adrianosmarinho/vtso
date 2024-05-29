@@ -11,6 +11,7 @@ markdown = "*"
 django-filter = "*"
 djangorestframework-stubs = "*"
 factory-boy = "*"
+drf-spectacular = "*"
 
 [dev-packages]
 black = "*"
