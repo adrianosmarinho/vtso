@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    volumes:
+      - .:/code
+      - db-data:/code/db
+    ports:
+      - "8001:8000"
+
+volumes:
+  db-data:
