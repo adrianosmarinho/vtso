@@ -1,7 +1,12 @@
 # Create your views here.
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import OpenApiResponse, extend_schema, extend_schema_view
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    extend_schema,
+    extend_schema_view,
+)
 from rest_framework import generics
 from rest_framework.exceptions import NotFound
 from rest_framework.filters import SearchFilter
@@ -65,6 +70,46 @@ class ShipList(generics.ListCreateAPIView):
     search_fields = ["name", "type", "year_built"]
 
 
+@extend_schema_view(
+    get=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                description="The ID of the ship to retrieve.",
+                required=True,
+                type=int,
+                location=OpenApiParameter.PATH,
+            )
+        ],
+        responses={200: ShipSerializer},
+    ),
+    put=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                description="The ID of the ship to update.",
+                required=True,
+                type=int,
+                location=OpenApiParameter.PATH,
+            )
+        ],
+        request=ShipSerializer,
+        responses={200: ShipSerializer},
+    ),
+    patch=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                description="The ID of the ship to partially update.",
+                required=True,
+                type=int,
+                location=OpenApiParameter.PATH,
+            )
+        ],
+        request=ShipSerializer,
+        responses={200: ShipSerializer},
+    ),
+)
 class ShipDetail(generics.RetrieveUpdateAPIView):
     """
     View for /vtso/ships/<int:pk>/ endpoint
@@ -78,6 +123,23 @@ class ShipDetail(generics.RetrieveUpdateAPIView):
     permission_classes = [AllowAny]
 
 
+@extend_schema_view(
+    get=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                description="The ID of the Ship to retrieve.",
+                required=True,
+                type=int,
+                location=OpenApiParameter.PATH,
+            )
+        ],
+        responses={
+            200: ShipSerializer,
+            404: OpenApiResponse(description="Ship not found."),
+        },
+    ),
+)
 class ShipVisits(generics.ListAPIView):
     """
     View for /vtso/ships/<int:pk>/visits/ endpoint.
@@ -135,6 +197,23 @@ class HarbourList(generics.ListCreateAPIView):
         return HarbourListSerializer
 
 
+@extend_schema_view(
+    get=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                description="The ID of the Harbour to retrieve.",
+                required=True,
+                type=int,
+                location=OpenApiParameter.PATH,
+            )
+        ],
+        responses={
+            200: ShipSerializer,
+            404: OpenApiResponse(description="Harbour not found."),
+        },
+    ),
+)
 class HarbourDetails(generics.RetrieveAPIView):
     """
     View for /vtso/harbours/id/details/ endpoint

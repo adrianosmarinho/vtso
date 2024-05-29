@@ -65,7 +65,7 @@ class HarbourListSerializer(serializers.ModelSerializer):
 class HarbourCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Harbour
-        fields = ["name", "max_berth_depth", "harbour_master", "city", "country"]
+        fields = ["id", "name", "max_berth_depth", "harbour_master", "city", "country"]
 
 
 class HarbourDetailsSerializer(serializers.ModelSerializer):
