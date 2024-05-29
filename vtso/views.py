@@ -154,6 +154,8 @@ class ShipDetail(generics.RetrieveUpdateAPIView):
 class ShipVisits(generics.ListAPIView):
     """
     View for /vtso/ships/<int:pk>/visits/ endpoint.
+
+    A GET request will list all the Harbours a Ship has visited.
     """
 
     serializer_class = ShipVisitSerializer
@@ -195,13 +197,15 @@ class ShipVisits(generics.ListAPIView):
 )
 class HarbourList(generics.ListCreateAPIView):
     """
-    View for /vtso/harbours endpoint
+    View for the /vtso/harbours/ endpoint.
 
-    TODO: add authentication
+    A GET request will list all the Harbours in the system.
+
+    A POST request will create a new Harbour.
     """
 
     queryset = Harbour.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         """
