@@ -31,7 +31,7 @@ def index(request):
 
 class CompanyList(generics.ListCreateAPIView):
     """
-    View for the /vtso/companies endpoint.
+    View for the /vtso/companies/ endpoint.
 
     A GET request will list all the Companies in the system.
 
@@ -47,13 +47,16 @@ class CompanyList(generics.ListCreateAPIView):
 
 class PersonList(generics.ListCreateAPIView):
     """
-    View for /vtso/persons endpoint
-    TODO: add authentication
+    View for the /vtso/persons/ endpoint.
+
+    A GET request will list all the Persons in the system.
+
+    A POST request will create a new Person.
     """
 
     queryset = Person.objects.select_related("company").all()
     serializer_class = PersonSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
 
 class ShipList(generics.ListCreateAPIView):

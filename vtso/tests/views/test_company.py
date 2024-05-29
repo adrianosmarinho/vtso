@@ -11,7 +11,7 @@ from vtso.tests.factories import CompanyFactory
 @pytest.mark.django_db
 class TestCompanyList:
     """
-    Unit tests for vtso/companies
+    Unit tests for /vtso/companies/
     """
 
     @pytest.fixture
