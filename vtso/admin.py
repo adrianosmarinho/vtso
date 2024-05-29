@@ -12,6 +12,7 @@ from .models import (
     PersonAdmin,
     Ship,
     ShipAdmin,
+    User,
     Visit,
     VisitAdmin,
 )
@@ -22,3 +23,4 @@ admin.site.register(Person, PersonAdmin)
 admin.site.register(Harbour, HarbourAdmin)
 admin.site.register(Ship, ShipAdmin)
 admin.site.register(Visit, VisitAdmin)
+admin.site.register(User)

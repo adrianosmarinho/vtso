@@ -1,5 +1,6 @@
 from django.urls import path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from rest_framework.authtoken import views as auth_token_views
 
 from . import views
 
@@ -29,4 +30,5 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
+    path("api/tokens/obtain", auth_token_views.obtain_auth_token),
 ]
