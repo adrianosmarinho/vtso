@@ -240,15 +240,16 @@ class HarbourList(generics.ListCreateAPIView):
 )
 class HarbourDetails(generics.RetrieveAPIView):
     """
-    View for /vtso/harbours/id/details/ endpoint
+    View for the /vtso/harbours/pk/details/ endpoint.
+
     A GET request will retrieve de details of a given Harbour, including
     a list of Ships currently docked at it.
-    TODO: add authentication
+
     """
 
     queryset = Harbour.objects.all()
     serializer_class = HarbourDetailsSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
 
 class VisitList(generics.ListCreateAPIView):

@@ -140,13 +140,20 @@ class TestHarbourDetails:
     Unit tests for /harbours/<int:pk>/details/
     """
 
+    @pytest.fixture
+    def api_client_authenticated(self):
+        user = User.objects.create(username="test_user")
+        token = Token.objects.create(user=user)
+        client = APIClient()
+        client.force_authenticate(user=user, token=token)
+        return client
+
     @pytest.mark.django_db
-    def test_harbour_details_view(self):
+    def test_harbour_details_view(self, api_client_authenticated):
         """
-        GET /harbours/id/details should return 200
+        GET /harbours/pk/details should return 200
         and contain one ship docked.
         """
-        client = APIClient()
 
         # Arrange
         harbour = HarbourFactory()
@@ -167,16 +174,30 @@ class TestHarbourDetails:
         url = reverse("harbour_details", kwargs={"pk": harbour.id})
 
         # Act
-        response = client.get(url)
+        response = api_client_authenticated.get(url)
 
         # # Assert
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data["current_ships"]) == 1
 
     @pytest.mark.django_db
-    def test_harbour_details_view_non_existent_harbour(self):
+    def test_harbour_details_view_non_existent_harbour(self, api_client_authenticated):
         """
-        GET /harbours/id/details should return 404.
+        GET /harbours/pk/details should return 404.
+        """
+        # Arrange
+        url = reverse("harbour_details", kwargs={"pk": 999})
+
+        # Act
+        response = api_client_authenticated.get(url)
+
+        # # Assert
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    @pytest.mark.django_db
+    def test_harbour_details_view_non_existent_harbour_unauthenticated(self):
+        """
+        GET /harbours/pk/details should return 401.
         """
         client = APIClient()
 
@@ -187,4 +208,7 @@ class TestHarbourDetails:
         response = client.get(url)
 
         # # Assert
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert (
+            response.data["detail"] == "Authentication credentials were not provided."
+        )
