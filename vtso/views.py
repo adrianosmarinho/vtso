@@ -122,15 +122,16 @@ class ShipList(generics.ListCreateAPIView):
 )
 class ShipDetail(generics.RetrieveUpdateAPIView):
     """
-    View for /vtso/ships/<int:pk>/ endpoint
-    A GET request will retrieve de details of a given Ship, while
+    View for the /vtso/ships/<int:pk>/ endpoint.
+
+    A GET request will retrieve the details of a given Ship, while
     a PUT or PATCH request will update a given Ship.
-    TODO: add authentication
+
     """
 
     queryset = Ship.objects.select_related("company").all()
     serializer_class = ShipSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
 
 @extend_schema_view(

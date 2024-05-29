@@ -161,10 +161,54 @@ class TestShipList:
 
 
 class TestShipDetail:
+    """
+    Unit tests for /ships/pk/
+    """
+
+    @pytest.fixture
+    def api_client_authenticated(self):
+        user = User.objects.create(username="test_user")
+        token = Token.objects.create(user=user)
+        client = APIClient()
+        client.force_authenticate(user=user, token=token)
+        return client
+
     @pytest.mark.django_db
-    def test_ship_detail_view(self):
+    def test_ship_detail_unauthenticated(self):
         """
-        GET /ships/id should return 200 if the Ship with the
+        GET /ships/pk/ should return 401.
+        """
+        # Arrange
+        company = CompanyFactory(name="Roxxon")
+        ship_data = {
+            "company": company,
+            "name": "Sea Master",
+            "tonnage": 4000,
+            "max_load_draft": 9,
+            "dry_draft": 4,
+            "flag": "Germany",
+            "beam": 18,
+            "length": 90,
+            "year_built": "2012",
+            "type": "tanker",
+        }
+        ship = ShipFactory(**ship_data)
+        client = APIClient()
+        url = reverse("ship_detail", kwargs={"pk": ship.id})
+
+        # Act
+        response = client.get(url)
+
+        # Assert
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert (
+            response.data["detail"] == "Authentication credentials were not provided."
+        )
+
+    @pytest.mark.django_db
+    def test_ship_detail_view(self, api_client_authenticated):
+        """
+        GET /ships/pk/ should return 200 if the Ship with the
         given id exists in the database.
         """
         # Arrange
@@ -182,34 +226,35 @@ class TestShipDetail:
             "type": "tanker",
         }
         ship = ShipFactory(**ship_data)
-        client = APIClient()
         url = reverse("ship_detail", kwargs={"pk": ship.id})
 
         # Act
-        response = client.get(url)
+        response = api_client_authenticated.get(url)
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == ship.id
 
     @pytest.mark.django_db
-    def test_ship_detail_invalid_id(self):
+    def test_ship_detail_invalid_id(self, api_client_authenticated):
         """
-        GET /ships/id should return 404 if the Ship with the
+        GET /ships/pk/ should return 404 if the Ship with the
         given id does not exist in the database.
         """
         # Arrange
-        client = APIClient()
         url = reverse("ship_detail", kwargs={"pk": 999})
 
         # Act
-        response = client.get(url)
+        response = api_client_authenticated.get(url)
 
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.django_db
-    def test_ship_update(self):
+    def test_ship_update(self, api_client_authenticated):
+        """
+        PATCH /ships/pk/ should return 200.
+        """
         # Arrange
         company = CompanyFactory(name="Roxxon")
         ship_data = {
@@ -225,12 +270,11 @@ class TestShipDetail:
             "type": "tanker",
         }
         ship = ShipFactory(**ship_data)
-        client = APIClient()
         url = reverse("ship_detail", kwargs={"pk": ship.id})
         data = {"name": "Titanic"}
 
         # Act
-        response = client.patch(url, data, format="json")
+        response = api_client_authenticated.patch(url, data, format="json")
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
