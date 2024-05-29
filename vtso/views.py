@@ -10,7 +10,7 @@ from drf_spectacular.utils import (
 from rest_framework import generics
 from rest_framework.exceptions import NotFound
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 
 from vtso.models import Company, Harbour, Person, Ship, Visit
 from vtso.serializers import (
@@ -254,10 +254,13 @@ class HarbourDetails(generics.RetrieveAPIView):
 
 class VisitList(generics.ListCreateAPIView):
     """
-    View for /vtso/visits endpoint
-    TODO: add authentication
+    View for the /vtso/visits endpoint.
+
+    A GET request will list all the Visits in the system.
+
+    A POST request will create a new Visit.
     """
 
     queryset = Visit.objects.select_related("harbour", "ship").all()
     serializer_class = VisitSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
