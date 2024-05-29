@@ -157,9 +157,18 @@ class ShipVisits(generics.ListAPIView):
     """
 
     serializer_class = ShipVisitSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        """
+        Returns all the Visits of the Ship specified by pk.
+
+        Raises:
+            NotFound: theres no Ship with the given pk in the database.
+
+        Returns:
+            QuerySet[Visit]:
+        """
         ship_id = self.kwargs["pk"]
         try:
             ship = Ship.objects.get(pk=ship_id)

@@ -282,12 +282,22 @@ class TestShipDetail:
 
 
 class TestShipVisits:
+    """
+    Unit tests for /ships/pk/visits/
+    """
+
+    @pytest.fixture
+    def api_client_authenticated(self):
+        user = User.objects.create(username="test_user")
+        token = Token.objects.create(user=user)
+        client = APIClient()
+        client.force_authenticate(user=user, token=token)
+        return client
 
     @pytest.mark.django_db
-    def test_ship_visits_multiple_visits(self):
+    def test_ship_visits_multiple_visits_unauthenticated(self):
         """
-        GET /ships/<int:pk>/visits should return 200 with
-        2 Harbours listed.
+        GET /ships/<int:pk>/visits should return 401.
         """
 
         client = APIClient()
@@ -298,37 +308,51 @@ class TestShipVisits:
 
         response = client.get(url)
 
+        # Assert
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert (
+            response.data["detail"] == "Authentication credentials were not provided."
+        )
+
+    @pytest.mark.django_db
+    def test_ship_visits_multiple_visits(self, api_client_authenticated):
+        """
+        GET /ships/<int:pk>/visits should return 200 with
+        2 Harbours listed.
+        """
+
+        ship = ShipFactory()
+        _ = VisitFactory.create_batch(2, ship=ship)
+        url = reverse("ship_visits", kwargs={"pk": ship.pk})
+
+        response = api_client_authenticated.get(url)
+
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 2
 
     @pytest.mark.django_db
-    def test_ship_visits_no_visits(self):
+    def test_ship_visits_no_visits(self, api_client_authenticated):
         """
         GET /ships/<int:pk>/visits should return 200 with
         no data if the Ship did not visit any Harbous.
         """
-        client = APIClient()
-
         ship_no_visits = ShipFactory()
         url_no_visits = reverse("ship_visits", kwargs={"pk": ship_no_visits.pk})
 
-        response_no_visits = client.get(url_no_visits)
+        response_no_visits = api_client_authenticated.get(url_no_visits)
 
         assert response_no_visits.status_code == status.HTTP_200_OK
         assert len(response_no_visits.data) == 0
 
     @pytest.mark.django_db
-    def test_ship_visits_error_cases(self):
+    def test_ship_visits_error_cases(self, api_client_authenticated):
         """
-        GET /ships/<int:pk>/visits should return 200 with
-        no data if the Ship did not visit any Harbous.
+        GET /ships/<int:pk>/visits should return 400 when the
+        given ship does not exist in the database.
         """
-        client = APIClient()
-
-        # Error case: Ship does not exist
         url_ship_not_found = reverse("ship_visits", kwargs={"pk": 999})
 
-        response = client.get(url_ship_not_found)
+        response = api_client_authenticated.get(url_ship_not_found)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert "Ship not found" in response.data["detail"]
