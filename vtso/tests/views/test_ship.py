@@ -1,15 +1,31 @@
 import pytest
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
+from vtso.models import User
 from vtso.tests.factories import CompanyFactory, ShipFactory, VisitFactory
 
 
 class TestShipList:
+    """
+    Unit tests for /vtso/ships/.
+    """
+
+    @pytest.fixture
+    def api_client_authenticated(self):
+        user = User.objects.create(username="test_user")
+        token = Token.objects.create(user=user)
+        client = APIClient()
+        client.force_authenticate(user=user, token=token)
+        return client
 
     @pytest.mark.django_db
-    def test_ship_list(self):
+    def test_ship_list_unauthenticated(self):
+        """
+        GET /ships/ should return 401.
+        """
         # Arrange
         company = CompanyFactory(name="Hammer Industries")
         _ = ShipFactory(
@@ -31,16 +47,42 @@ class TestShipList:
         response = client.get(url)
 
         # Assert
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert (
+            response.data["detail"] == "Authentication credentials were not provided."
+        )
+
+    @pytest.mark.django_db
+    def test_ship_list(self, api_client_authenticated):
+        # Arrange
+        company = CompanyFactory(name="Hammer Industries")
+        _ = ShipFactory(
+            **{
+                "name": "Ocean Pearl",
+                "company": company,
+            }
+        )
+        _ = ShipFactory(
+            **{
+                "name": "Titanic",
+                "company": company,
+            }
+        )
+        url = reverse("ships")
+
+        # Act
+        response = api_client_authenticated.get(url)
+
+        # Assert
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 2
 
     @pytest.mark.django_db
-    def test_create_ship(self):
+    def test_create_ship(self, api_client_authenticated):
         """
         POST /ships should return 201
         """
         # Arrange
-        client = APIClient()
         company = CompanyFactory(name="Hammer Industries")
         ship_data = {
             "company": company.id,
@@ -57,20 +99,19 @@ class TestShipList:
         url = reverse("ships")
 
         # Act
-        response = client.post(url, data=ship_data)
+        response = api_client_authenticated.post(url, data=ship_data)
 
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["name"] == ship_data["name"]
 
     @pytest.mark.django_db
-    def test_create_ship_company_does_not_exist(self):
+    def test_create_ship_company_does_not_exist(self, api_client_authenticated):
         """
         POST /ships should return return 400 as the View will not
         allow the creation of a Ship operated by a non-existent company
         """
         # Arrange
-        client = APIClient()
         ship_data = {
             # there is no Company with id 10 in the database
             "company": 10,
@@ -87,19 +128,18 @@ class TestShipList:
         url = reverse("ships")
 
         # Act
-        response = client.post(url, data=ship_data)
+        response = api_client_authenticated.post(url, data=ship_data)
 
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.django_db
-    def test_create_ship_without_company(self):
+    def test_create_ship_without_company(self, api_client_authenticated):
         """
         POST /ships should return return 400 as the View will not
         allow the creation of a Ship without a Company
         """
         # Arrange
-        client = APIClient()
         ship_data = {
             "name": "Sea Master",
             "tonnage": 4000,
@@ -114,7 +154,7 @@ class TestShipList:
         url = reverse("ships")
 
         # Act
-        response = client.post(url, data=ship_data)
+        response = api_client_authenticated.post(url, data=ship_data)
 
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST

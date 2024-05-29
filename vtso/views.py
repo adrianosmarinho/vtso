@@ -61,15 +61,20 @@ class PersonList(generics.ListCreateAPIView):
 
 class ShipList(generics.ListCreateAPIView):
     """
-    View for /vtso/ships endpoint.
+    View for /vtso/ships/ endpoint.
+
+    A GET request will list all the Ships in the system, including their age.
+
+    A POST request will create a new Ship.
+
     Here we leverage DRF filtering and search to implement
     the bonus requirement.
-    TODO: add authentication
+
     """
 
     queryset = Ship.objects.select_related("company").all()
     serializer_class = ShipSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     filter_backends = [SearchFilter, DjangoFilterBackend]
     filterset_fields = ["type"]
     search_fields = ["name", "type", "year_built"]
