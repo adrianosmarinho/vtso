@@ -25,7 +25,10 @@ class Company(models.Model):
 
 
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ("name",)
+    list_display = (
+        "id",
+        "name",
+    )
 
     # enables seach on the Admin portal
     search_fields = ["name"]
@@ -69,7 +72,14 @@ class Harbour(models.Model):
 
 
 class HarbourAdmin(admin.ModelAdmin):
-    list_display = ("name", "max_berth_depth", "city", "country")
+    list_display = (
+        "id",
+        "name",
+        "max_berth_depth",
+        "harbour_master",
+        "city",
+        "country",
+    )
 
     # enables seach on the Admin portal
     search_fields = ["name", "max_berth_depth", "city", "country"]
@@ -145,6 +155,7 @@ class Ship(models.Model):
 
 class ShipAdmin(admin.ModelAdmin):
     list_display = (
+        "id",
         "name",
         "tonnage",
         "max_load_draft",

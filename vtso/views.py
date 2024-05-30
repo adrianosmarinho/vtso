@@ -1,5 +1,3 @@
-# Create your views here.
-from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import (
     OpenApiParameter,
@@ -23,10 +21,6 @@ from vtso.serializers import (
     ShipVisitSerializer,
     VisitSerializer,
 )
-
-
-def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
 
 
 class CompanyList(generics.ListCreateAPIView):
@@ -181,7 +175,7 @@ class ShipVisits(generics.ListAPIView):
 
 @extend_schema_view(
     get=extend_schema(
-        description="Retrieve a list of harbours",
+        description="List all the Harbours in the system",
         responses={200: HarbourListSerializer(many=True)},
     ),
     post=extend_schema(
@@ -242,7 +236,7 @@ class HarbourDetails(generics.RetrieveAPIView):
     """
     View for the /vtso/harbours/pk/details/ endpoint.
 
-    A GET request will retrieve de details of a given Harbour, including
+    A GET request will retrieve the details of a given Harbour, including
     a list of Ships currently docked at it.
 
     """
