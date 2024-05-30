@@ -30,5 +30,5 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
-    path("api/tokens/obtain", auth_token_views.obtain_auth_token),
+    path("tokens/obtain/", auth_token_views.obtain_auth_token),
 ]
