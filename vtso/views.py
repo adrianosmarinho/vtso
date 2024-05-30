@@ -1,5 +1,3 @@
-# Create your views here.
-from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import (
     OpenApiParameter,
@@ -23,10 +21,6 @@ from vtso.serializers import (
     ShipVisitSerializer,
     VisitSerializer,
 )
-
-
-def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
 
 
 class CompanyList(generics.ListCreateAPIView):

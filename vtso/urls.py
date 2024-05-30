@@ -5,7 +5,6 @@ from rest_framework.authtoken import views as auth_token_views
 from . import views
 
 urlpatterns = [
-    path("", views.index, name="index"),
     path("companies/", views.CompanyList.as_view(), name="companies"),
     path("persons/", views.PersonList.as_view(), name="persons"),
     # list or create a ship
